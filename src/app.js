@@ -9,14 +9,14 @@ let userId = ''
 let skillChecked =''
 
 const client = platformClient.ApiClient.instance;
-client.setEnvironment(platformClient.PureCloudRegionHosts.us_east_1); 
-loginClient()
-function loginClient(){
+client.setEnvironment(platformClient.PureCloudRegionHosts.us_east_1);
+
+app.get('/skillChecked', function(req, res){
     client.loginClientCredentialsGrant(clientId,clientSecret)
     .then((data)=> {
+        console.log(data.accessToken)
         client.setAccessToken(data.accessToken)
-        app.get('/skillChecked', function(req, res){
-            userId = req.query.id
+        userId = req.query.id
             skillChecked = req.query.skill
             console.log(userId)
             console.log(skillChecked)
@@ -30,11 +30,15 @@ function loginClient(){
                 // Add routing skill to user
                 console.log("if block"+skillChecked+" "+userId)
                 apiInstance.postUserRoutingskills(userId, body)
-                .then((data1) => {
-                    console.log(data1)
+                .then((out) => {
+                    res.send({
+                        output: "Success"
+                    })
                 })
                 .catch((err) => {
-                    refreshCode()
+                    res.send({
+                        output: "Failure"
+                    })
                 });
             }
             else{
@@ -43,60 +47,72 @@ function loginClient(){
                 console.log("else block"+skillChecked+" "+userId)
                 // Remove routing skill from user
                 apiInstance.deleteUserRoutingskill(userId, skillId)
-                .then((data1) => {
-                    console.log(data1)
+                .then((out) => {
+                    res.send({
+                        output: "Success"
+                    })
                 })
                 .catch((err) => {
-                    refreshCode()
+                    res.send({
+                        output: "Success"
+                    })
                 });
             }
         })
-    })
-    .catch((err) => {
-        refreshCode()
-    });
-} 
+})
+// function loginClient(){
+//     client.loginClientCredentialsGrant(clientId,clientSecret)
+//     .then((data)=> {
+//         client.setAccessToken(data.accessToken)
+//         app.get('/skillChecked', function(req, res){
+            
+//         })
+//     })
+//     .catch((err) => {
+//         refreshCode()
+//     });
+// } 
 
 
-function refreshCode() {
-    client.loginClientCredentialsGrant(clientId,clientSecret)
-    .then((data)=> {
-        client.setAccessToken(data.accessToken)
-            if(skillChecked=="true"){
-                let apiInstance = new platformClient.UsersApi();
-                let body = {
-                    "id": "cb8856d4-7647-43bf-9d32-c055af95dd70",
-                    "proficiency": 0
-                }; // Object | Skill
+// function refreshCode() {
+//     client.loginClientCredentialsGrant(clientId,clientSecret)
+//     .then((data)=> {
+//         client.setAccessToken(data.accessToken)
+//             if(skillChecked=="true"){
+//                 let apiInstance = new platformClient.UsersApi();
+//                 let body = {
+//                     "id": "cb8856d4-7647-43bf-9d32-c055af95dd70",
+//                     "proficiency": 0
+//                 }; // Object | Skill
 
-                // Add routing skill to user
-                console.log("if block"+skillChecked+" "+userId)
-                apiInstance.postUserRoutingskills(userId, body)
-                .then((data1) => {
-                    console.log(data1)
-                })
-                .catch((err) => {
-                    console.log(err)
-                });
-            }
-            else{
-                let apiInstance = new platformClient.UsersApi();
-                let skillId = "cb8856d4-7647-43bf-9d32-c055af95dd70"; // String | skillId
-                console.log("else block"+skillChecked+" "+userId)
-                // Remove routing skill from user
-                apiInstance.deleteUserRoutingskill(userId, skillId)
-                .then((data1) => {
-                    console.log(data1)
-                })
-                .catch((err) => {
-                    console.log(err)
-                });
-            }
-        })
-        .catch((err)=>{
-            console.log(err)
-        })
-    }
+//                 // Add routing skill to user
+//                 console.log("if block"+skillChecked+" "+userId)
+//                 apiInstance.postUserRoutingskills(userId, body)
+//                 .then((data1) => {
+//                     console.log(data1)
+//                 })
+//                 .catch((err) => {
+//                     console.log(err)
+//                 });
+//             }
+//             else{
+//                 let apiInstance = new platformClient.UsersApi();
+//                 let skillId = "cb8856d4-7647-43bf-9d32-c055af95dd70"; // String | skillId
+//                 console.log("else block"+skillChecked+" "+userId)
+//                 // Remove routing skill from user
+//                 apiInstance.deleteUserRoutingskill(userId, skillId)
+//                 .then((data1) => {
+//                     console.log(data1)
+//                 })
+//                 .catch((err) => {
+//                     console.log(err)
+//                 });
+//             }
+//         })
+//         .catch((err)=>{
+//             console.log(err)
+//         })
+//     }
 
 // function skillOperation(){
 //     console.log("skillOperation")
